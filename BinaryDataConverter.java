@@ -61,7 +61,7 @@ public class BinaryDataConverter {
     
                     break;
     
-                // karagül
+                // karagul
                 case "int":
     
                     break;
