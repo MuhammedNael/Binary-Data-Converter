@@ -104,6 +104,16 @@ public class BinaryDataConverter {
         }
         return littleEndian;
     }
+    public static String unsigned(String currentBin) {
+        long currrentInt = 0;
+        for (int i = 0; i < currentBin.length(); i++) {
+            char c = currentBin.charAt(i);
+            int digit = Character.getNumericValue(c);
+            currrentInt += digit * Math.pow(2, currentBin.length() - 1 - i);
+        }
+        return Long.toString(currrentInt);
+    }
+    
     public static void main(String[] args) throws FileNotFoundException, IOException {
         Scanner inputReader = new Scanner(System.in);
         Scanner lineCounter = null;
@@ -211,17 +221,19 @@ public class BinaryDataConverter {
             // kadir
             case "unsigned":
                 // convert hex to bin
-                // deneme
                 for (int i = 1; i <= rowCounter; i++) {
                     for (int j = 1; j <= HEX_NUMBER / dataSize; j++) {
                         String currentHex = inputNumber.get(i + ":" + j);
                         String currentBin = hexToBin(currentHex);
-                        // convert bin to unsigned
-
-                        //put the output to the outputNumber hashmap
+                        
+                        // Convert binary string to unsigned integer
+                        outputNumber.put(i + ":" + j, unsigned(currentBin));
+                        
 
                     }
                 }
+                printHashMap(outputNumber, rowCounter, dataSize, outputWriter);
+                
                 break;
 
             default:
