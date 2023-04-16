@@ -211,6 +211,7 @@ public class BinaryDataConverter {
             // kadir
             case "unsigned":
                 // convert hex to bin
+                // deneme
                 for (int i = 1; i <= rowCounter; i++) {
                     for (int j = 1; j <= HEX_NUMBER / dataSize; j++) {
                         String currentHex = inputNumber.get(i + ":" + j);
