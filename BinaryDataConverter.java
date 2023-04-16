@@ -147,7 +147,7 @@ public class BinaryDataConverter {
             String currentLine = splitter.nextLine();
             dataInCurrentLine = currentLine.split(" ");
             // if the byte ordering is little endian, reverse the order of the hex numbers
-            if (byteOrdering.equals("l")) {
+            if (byteOrdering.equalsIgnoreCase("l")) {
                     for (int i = 0; i < HEX_NUMBER; i += dataSize) {
                         int k = dataSize + i;
                         for (int j = i; j < i + dataSize/2; j++) {
