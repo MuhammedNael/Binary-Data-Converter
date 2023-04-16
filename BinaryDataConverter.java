@@ -6,11 +6,12 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 public class BinaryDataConverter {
+    final static int HEX_NUMBER = 12;
 
     public static void printHashMap(HashMap<String, String> outputNumber, int rowCounter, int dataSize,
             FileWriter outpuWriter) throws IOException, FileNotFoundException {
         for (int i = 1; i <= rowCounter; i++) {
-            for (int j = 1; j <= 12 / dataSize; j++) {
+            for (int j = 1; j <= HEX_NUMBER / dataSize; j++) {
                 System.out.print(outputNumber.get(i + ":" + j) + " ");
                 try {
                     outpuWriter.write(outputNumber.get(i + ":" + j) + " ");
@@ -96,6 +97,13 @@ public class BinaryDataConverter {
         return bin;
     }
 
+    public static String littleEndianHex (String hex) {
+        String littleEndian = "";
+        for (int i = hex.length() - 1; i >= 0; i--) {
+            littleEndian += hex.charAt(i);
+        }
+        return littleEndian;
+    }
     public static void main(String[] args) throws FileNotFoundException, IOException {
         Scanner inputReader = new Scanner(System.in);
         Scanner lineCounter = null;
@@ -132,12 +140,24 @@ public class BinaryDataConverter {
         int rowCounter = 0;
         HashMap<String, String> inputNumber = new HashMap<String, String>();
         HashMap<String, String> outputNumber = new HashMap<String, String>();
-        String[] dataInCurrentLine = new String[12];
+        String[] dataInCurrentLine = new String[HEX_NUMBER];
 
         while (splitter.hasNextLine()) {
             // get the current line
             String currentLine = splitter.nextLine();
             dataInCurrentLine = currentLine.split(" ");
+            // if the byte ordering is little endian, reverse the order of the hex numbers
+            if (byteOrdering.equals("l")) {
+                    for (int i = 0; i < 12; i += dataSize) {
+                        int k = dataSize + i;
+                        for (int j = i; j < i + dataSize/2; j++) {
+                            String temp = dataInCurrentLine[j];
+                            dataInCurrentLine[j] = dataInCurrentLine[k - 1];
+                            dataInCurrentLine[k - 1] = temp;
+                            k--;
+                        }
+                    }    
+            }                         
 
             String currentString = "";
             rowCounter++;
@@ -161,9 +181,12 @@ public class BinaryDataConverter {
             case "float":
                 // convert hex to bin
                 for (int i = 1; i <= rowCounter; i++) {
-                    for (int j = 1; j <= 12 / dataSize; j++) {
+                    for (int j = 1; j <= HEX_NUMBER / dataSize; j++) {
                         String currentHex = inputNumber.get(i + ":" + j);
                         String currentBin = hexToBin(currentHex);
+                        // convert bin to float
+
+                        //put the output to the outputNumber hashmap
 
                     }
                 }
@@ -173,9 +196,12 @@ public class BinaryDataConverter {
             case "int":
                 // convert hex to bin
                 for (int i = 1; i <= rowCounter; i++) {
-                    for (int j = 1; j <= 12 / dataSize; j++) {
+                    for (int j = 1; j <= HEX_NUMBER / dataSize; j++) {
                         String currentHex = inputNumber.get(i + ":" + j);
                         String currentBin = hexToBin(currentHex);
+                        // convert bin to int
+
+                        //put the output to the outputNumber hashmap
 
                     }
                 }
@@ -186,9 +212,12 @@ public class BinaryDataConverter {
             case "unsigned":
                 // convert hex to bin
                 for (int i = 1; i <= rowCounter; i++) {
-                    for (int j = 1; j <= 12 / dataSize; j++) {
+                    for (int j = 1; j <= HEX_NUMBER / dataSize; j++) {
                         String currentHex = inputNumber.get(i + ":" + j);
                         String currentBin = hexToBin(currentHex);
+                        // convert bin to unsigned
+
+                        //put the output to the outputNumber hashmap
 
                     }
                 }
