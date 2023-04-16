@@ -6,6 +6,96 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 public class BinaryDataConverter {
+
+    public static void printHashMap(HashMap<String, String> outputNumber, int rowCounter, int dataSize,
+            FileWriter outpuWriter) throws IOException, FileNotFoundException {
+        for (int i = 1; i <= rowCounter; i++) {
+            for (int j = 1; j <= 12 / dataSize; j++) {
+                System.out.print(outputNumber.get(i + ":" + j) + " ");
+                try {
+                    outpuWriter.write(outputNumber.get(i + ":" + j) + " ");
+                } catch (FileNotFoundException e) {
+                    System.out.println("Output file is not found.");
+                } catch (IOException e) {
+                    System.out.println("Output file is not found.");
+                }
+            }
+            System.out.println();
+            try {
+                outpuWriter.write("\n");
+            } catch (FileNotFoundException e) {
+                System.out.println("Output file is not found.");
+            } catch (IOException e) {
+                System.out.println("Output file is not found.");
+            }
+        }
+    }
+
+    public static String hexNumbers(char hex) {
+        String bin = "";
+        switch (hex) {
+            case '0':
+                bin = "0000";
+                break;
+            case '1':
+                bin = "0001";
+                break;
+            case '2':
+                bin = "0010";
+                break;
+            case '3':
+                bin = "0011";
+                break;
+            case '4':
+                bin = "0100";
+                break;
+            case '5':
+                bin = "0101";
+                break;
+            case '6':
+                bin = "0110";
+                break;
+            case '7':
+                bin = "0111";
+                break;
+            case '8':
+                bin = "1000";
+                break;
+            case '9':
+                bin = "1001";
+                break;
+            case 'a':
+                bin = "1010";
+                break;
+            case 'b':
+                bin = "1011";
+                break;
+            case 'c':
+                bin = "1100";
+                break;
+            case 'd':
+                bin = "1101";
+                break;
+            case 'e':
+                bin = "1110";
+                break;
+            case 'f':
+                bin = "1111";
+                break;
+            default:
+                break;
+        }
+        return bin;
+    }
+
+    public static String hexToBin(String hex) {
+        String bin = "";
+        for (int i = 0; i < hex.length(); i++) {
+            bin += hexNumbers(hex.charAt(i));
+        }
+        return bin;
+    }
+
     public static void main(String[] args) throws FileNotFoundException, IOException {
         Scanner inputReader = new Scanner(System.in);
         Scanner lineCounter = null;
@@ -39,15 +129,6 @@ public class BinaryDataConverter {
         System.out.println("Enter the size of data (1, 2, 3 or 4):");
         int dataSize = inputReader.nextInt();
 
-        int lineCount = 0;
-
-        while (lineCounter.hasNextLine()) {
-            lineCount++;
-            if (lineCounter.nextLine() == null) {
-                break;
-            }
-        }
-
         int rowCounter = 0;
         HashMap<String, String> inputNumber = new HashMap<String, String>();
         HashMap<String, String> outputNumber = new HashMap<String, String>();
@@ -78,22 +159,48 @@ public class BinaryDataConverter {
 
             // nael ve said
             case "float":
+                // convert hex to bin
+                for (int i = 1; i <= rowCounter; i++) {
+                    for (int j = 1; j <= 12 / dataSize; j++) {
+                        String currentHex = inputNumber.get(i + ":" + j);
+                        String currentBin = hexToBin(currentHex);
 
+                    }
+                }
                 break;
 
             // karagul
             case "int":
+                // convert hex to bin
+                for (int i = 1; i <= rowCounter; i++) {
+                    for (int j = 1; j <= 12 / dataSize; j++) {
+                        String currentHex = inputNumber.get(i + ":" + j);
+                        String currentBin = hexToBin(currentHex);
+
+                    }
+                }
 
                 break;
 
             // kadir
             case "unsigned":
+                // convert hex to bin
+                for (int i = 1; i <= rowCounter; i++) {
+                    for (int j = 1; j <= 12 / dataSize; j++) {
+                        String currentHex = inputNumber.get(i + ":" + j);
+                        String currentBin = hexToBin(currentHex);
 
+                    }
+                }
                 break;
 
             default:
                 break;
         }
+        // print the output
+        // printHashMap(outputNumber, rowCounter, dataSize, outputWriter);
+
+        // close scanners
         inputReader.close();
         lineCounter.close();
         outputWriter.close();
