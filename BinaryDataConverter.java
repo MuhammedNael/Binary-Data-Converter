@@ -117,7 +117,6 @@ public class BinaryDataConverter {
 
     public static void main(String[] args) throws FileNotFoundException, IOException {
         Scanner inputReader = new Scanner(System.in);
-        Scanner lineCounter = null;
         Scanner splitter = null;
         FileWriter outputWriter = null;
         File input = null;
@@ -127,7 +126,6 @@ public class BinaryDataConverter {
 
         try {
             input = new File("./" + inputFileName + ".txt");
-            lineCounter = new Scanner(input);
             splitter = new Scanner(input);
         } catch (FileNotFoundException e) {
             System.out.println("Input file is not found.");
@@ -257,7 +255,6 @@ public class BinaryDataConverter {
 
         // close scanners
         inputReader.close();
-        lineCounter.close();
         outputWriter.close();
     }
 
