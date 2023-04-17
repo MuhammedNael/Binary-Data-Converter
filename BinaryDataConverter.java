@@ -243,7 +243,7 @@ public class BinaryDataConverter {
 
                     }
                 }
-                printHashMap(outputNumber, rowCounter, dataSize, outputWriter);
+                
 
                 break;
 
