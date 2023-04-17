@@ -132,7 +132,7 @@ public class BinaryDataConverter {
     			addedOne[i] = '0';
     	}
     	if (carry == 1) {
-    		addedOne[0] = '1';
+    		addedOne[0] = '0';
     	}
     	String added = "";
     	for (int i = 0; i < addedOne.length; i++)
@@ -162,6 +162,17 @@ public class BinaryDataConverter {
     		largestExp += 1 * Math.pow(2, expBits - i);
     	}
     	
+    	// Normalized values
+    	if (expValue != 0 && expValue != largestExp) {
+    		mantissa = 1;
+    		E = expValue - bias;
+    	}
+    	// Denormalized values
+    	else if (expValue == 0) {
+    		mantissa = 0;
+    		E = 1 - bias;
+    	}
+    	
     	// splitting the string to make calculating fraction part easier
     	String fraction = s.substring(expBits + 1, bitDataSize);
     	if (fraction.length() > 13) {
@@ -180,11 +191,25 @@ public class BinaryDataConverter {
     	    			 halfWay = false;
     	    		 }
     	    	 }
+    	    	 // check when fraction is 1 to increment mantissa
+    	    	 boolean incrementMantissa = true;
+    	    	 for (int i = 0; i < roundFrac.length(); i++) {
+    	    		 if (roundFrac.charAt(i) != '1')
+    	    			 incrementMantissa = false;
+    	    	 }
     	    	 
-    	    	 if (greaterThanHalfWay) 
+    	    	 if (greaterThanHalfWay) {
     	    		 roundFrac = addOneToFraction(roundFrac);
-    	    	 else if (halfWay && roundFrac.charAt(12) == '1')
+    	    		 if (incrementMantissa) {
+    	    			 mantissa++;
+    	    		 }
+    	    	 }
+    	    	 else if (halfWay && roundFrac.charAt(12) == '1') {
     	    		 roundFrac = addOneToFraction(roundFrac);
+    	    		 if (incrementMantissa) {
+    	    			 mantissa++;
+    	    		 }
+    	    	 }
     	    	 
     	    	 fraction = roundFrac;	 
     	     }
@@ -192,16 +217,6 @@ public class BinaryDataConverter {
     	
     	// calculate mantissa
     	
-    	// Normalized values
-    	if (expValue != 0 && expValue != largestExp) {
-    		mantissa = 1;
-    		E = expValue - bias;
-    	}
-    	// Denormalized values
-    	else if (expValue == 0) {
-    		mantissa = 0;
-    		E = 1 - bias;
-    	}
     	// calculate decimal value for both normalized and denormalized values
     	for (int i = 0; i < fraction.length(); i++) {
     		int bit = Character.getNumericValue(fraction.charAt(i));
