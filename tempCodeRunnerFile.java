@@ -1,0 +1,1 @@
+utputNumber.put(i + ":" + j, unsigned(currentBin));

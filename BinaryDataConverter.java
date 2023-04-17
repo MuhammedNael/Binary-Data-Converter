@@ -200,6 +200,7 @@ public class BinaryDataConverter {
                         String currentHex = inputNumber.get(i + ":" + j);
                         String currentBin = hexToBin(currentHex);
                         // convert bin to int
+//alooooooooooooooooooooo
 
                         //put the output to the outputNumber hashmap
 
