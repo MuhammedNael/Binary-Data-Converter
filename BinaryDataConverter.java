@@ -2,9 +2,185 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class BinaryDataConverter {
+    final static int HEX_NUMBER = 12;
+
+    public static void printHashMap(HashMap<String, String> outputNumber, int rowCounter, int dataSize,
+            FileWriter outpuWriter) throws IOException, FileNotFoundException {
+        for (int i = 1; i <= rowCounter; i++) {
+            for (int j = 1; j <= HEX_NUMBER / dataSize; j++) {
+                System.out.print(outputNumber.get(i + ":" + j) + " ");
+                try {
+                    outpuWriter.write(outputNumber.get(i + ":" + j) + " ");
+                } catch (FileNotFoundException e) {
+                    System.out.println("Output file is not found.");
+                } catch (IOException e) {
+                    System.out.println("Output file is not found.");
+                }
+            }
+            System.out.println();
+            try {
+                outpuWriter.write("\n");
+            } catch (FileNotFoundException e) {
+                System.out.println("Output file is not found.");
+            } catch (IOException e) {
+                System.out.println("Output file is not found.");
+            }
+        }
+    }
+
+    public static String hexNumbers(char hex) {
+        String bin = "";
+        switch (hex) {
+            case '0':
+                bin = "0000";
+                break;
+            case '1':
+                bin = "0001";
+                break;
+            case '2':
+                bin = "0010";
+                break;
+            case '3':
+                bin = "0011";
+                break;
+            case '4':
+                bin = "0100";
+                break;
+            case '5':
+                bin = "0101";
+                break;
+            case '6':
+                bin = "0110";
+                break;
+            case '7':
+                bin = "0111";
+                break;
+            case '8':
+                bin = "1000";
+                break;
+            case '9':
+                bin = "1001";
+                break;
+            case 'a':
+                bin = "1010";
+                break;
+            case 'b':
+                bin = "1011";
+                break;
+            case 'c':
+                bin = "1100";
+                break;
+            case 'd':
+                bin = "1101";
+                break;
+            case 'e':
+                bin = "1110";
+                break;
+            case 'f':
+                bin = "1111";
+                break;
+            default:
+                break;
+        }
+        return bin;
+    }
+
+    public static String hexToBin(String hex) {
+        String bin = "";
+        for (int i = 0; i < hex.length(); i++) {
+            bin += hexNumbers(hex.charAt(i));
+        }
+        return bin;
+    }
+
+    public static String littleEndianHex (String hex) {
+        String littleEndian = "";
+        for (int i = hex.length() - 1; i >= 0; i--) {
+            littleEndian += hex.charAt(i);
+        }
+        return littleEndian;
+    }
+    
+    public static String unsigned(String currentBin) {
+        long currrentInt = 0;
+        for (int i = 0; i < currentBin.length(); i++) {
+            char c = currentBin.charAt(i);
+            int digit = Character.getNumericValue(c);
+            currrentInt += digit * Math.pow(2, currentBin.length() - 1 - i);
+        }
+        return Long.toString(currrentInt);
+    }
+    
+    public static String binToFloat(String s, int byteDataSize) {
+    	int bitDataSize = 8 * byteDataSize;
+    	int expBits = byteDataSize * 2 + 2;
+    	int signBit = 0, expValue = 0, E = 0, bias = 0;
+    	double mantissa = 0;
+
+    	bias = (int) (Math.pow(2, expBits - 1) - 1);
+    	signBit = s.charAt(0) == 1 ? 1 : 0;
+    	
+    	String sign;
+    	sign = signBit == 0 ? "" : "-";
+    	
+    	// calculating exponent value
+    	for (int i = 1; i <= expBits; i++) {
+    		int bit = Character.getNumericValue(s.charAt(i));
+    		expValue += bit * Math.pow(2, expBits - i);
+    	}
+    	
+    	// calculate largest exponent value
+    	int largestExp = 0;
+    	for (int i = 1; i <= expBits; i++) {
+    		largestExp += 1 * Math.pow(2, expBits - i);
+    	}
+    	
+    	// splitting the string to make calculating fraction part  easier
+    	String fraction = s.substring(expBits + 1, bitDataSize);
+    	if (fraction.length() > 13) {
+    		/*
+        	 *  ??? round to even ???
+        	 */
+    		 String roundFrac = fraction.substring(0, 13);
+    	     String checkHalfWay = fraction.substring(13);
+    	}
+    	
+    	// calculate mantissa
+    	
+    	// Normalized values
+    	if (expValue != 0 && expValue != largestExp) {
+    		mantissa = 1;
+    		E = expValue - bias;
+    	}
+    	// Denormalized values
+    	else if (expValue == 0) {
+    		mantissa = 0;
+    		E = 1 - bias;
+    	}
+    	// calculate decimal value for both normalized and denormalized values
+    	for (int i = 0; i < fraction.length(); i++) {
+    		int bit = Character.getNumericValue(fraction.charAt(i));
+    		mantissa += bit * Math.pow(2, (fraction.length() - i - 1));
+    	}
+    	// return Normalized and Denormalized values
+    	if (expValue != largestExp) {
+    		double decimalValue = Math.pow(-1, signBit) * mantissa * Math.pow(2, E);
+    		return String.format("%.5e", decimalValue);
+    	}
+    	// return special cases (i.e. inf, NaN)
+    	else if (expValue == largestExp) {
+    		if (mantissa == 0)
+    			return sign + "inf";
+    		else
+    			return "NaN";
+    	}
+    	return "";
+    }
+    
     public static void main(String[] args) throws FileNotFoundException, IOException {
         Scanner inputReader = new Scanner(System.in);
         Scanner lineCounter = null;
@@ -38,46 +214,107 @@ public class BinaryDataConverter {
         System.out.println("Enter the size of data (1, 2, 3 or 4):");
         int dataSize = inputReader.nextInt();
 
-        int lineCount = 0;
+        int rowCounter = 0;
+        HashMap<String, String> inputNumber = new HashMap<String, String>();
+        HashMap<String, String> outputNumber = new HashMap<String, String>();
+        String[] dataInCurrentLine = new String[HEX_NUMBER];
 
-        while (lineCounter.hasNextLine()) {
-            lineCount++;
-            if (lineCounter.nextLine() == null) {
-                break;
-            }
-        }
-
-        String[] dataInCurrentLine = new String[lineCount * 12];
         while (splitter.hasNextLine()) {
-            //get the current line
+            // get the current line
             String currentLine = splitter.nextLine();
             dataInCurrentLine = currentLine.split(" ");
+            // if the byte ordering is little endian, reverse the order of the hex numbers
+            if (byteOrdering.equalsIgnoreCase("l")) {
+                    for (int i = 0; i < HEX_NUMBER; i += dataSize) {
+                        int k = dataSize + i;
+                        for (int j = i; j < i + dataSize/2; j++) {
+                            String temp = dataInCurrentLine[j];
+                            dataInCurrentLine[j] = dataInCurrentLine[k - 1];
+                            dataInCurrentLine[k - 1] = temp;
+                            k--;
+                        }
+                    }    
+            }                         
 
-            // convert from hexadecimal to decimal
-            switch (dataType) {
+            String currentString = "";
+            rowCounter++;
 
-                // nael ve said
-                case "float":
-    
-                    break;
-    
-                // karagül
-                case "int":
-    
-                    break;
-    
-                // kadir
-                case "unsigned":
-    
-                    break;
-    
-                default:
-                    break;
+            for (int i = 0; i < dataInCurrentLine.length; i++) {
+                currentString += dataInCurrentLine[i];
+
+                if (currentString != null && currentString != "" && (i + 1) % dataSize == 0) {
+                    inputNumber.put(rowCounter + ":" + (i + 1) / dataSize, currentString);
+                    currentString = "";
+                }
+
             }
+
         }
 
+        // convert from hexadecimal to decimal
+        switch (dataType) {
+
+            // nael ve said
+            case "float":
+                // convert hex to bin
+                for (int i = 1; i <= rowCounter; i++) {
+                    for (int j = 1; j <= HEX_NUMBER / dataSize; j++) {
+                        String currentHex = inputNumber.get(i + ":" + j);
+                        String currentBin = hexToBin(currentHex);
+                        System.out.println(currentBin);
+                        // convert bin to float
+                        String currentFloat = binToFloat(currentBin, dataSize);
+
+                        //put the output to the outputNumber hashmap
+
+                    }
+                }
+                break;
+
+            // karagul
+            case "int":
+                // convert hex to bin
+                for (int i = 1; i <= rowCounter; i++) {
+                    for (int j = 1; j <= HEX_NUMBER / dataSize; j++) {
+                        String currentHex = inputNumber.get(i + ":" + j);
+                        String currentBin = hexToBin(currentHex);
+                        // convert bin to int
+
+                        //put the output to the outputNumber hashmap
+
+                    }
+                }
+
+                break;
+
+            // kadir
+            case "unsigned":
+                // convert hex to bin
+                for (int i = 1; i <= rowCounter; i++) {
+                    for (int j = 1; j <= HEX_NUMBER / dataSize; j++) {
+                        String currentHex = inputNumber.get(i + ":" + j);
+                        String currentBin = hexToBin(currentHex);
+                        
+                        // Convert binary string to unsigned integer
+                        outputNumber.put(i + ":" + j, unsigned(currentBin));
+                        
+
+                    }
+                }
+                printHashMap(outputNumber, rowCounter, dataSize, outputWriter);
+                
+                break;
+
+            default:
+                break;
+        }
+        // print the output
+        // printHashMap(outputNumber, rowCounter, dataSize, outputWriter);
+
+        // close scanners
         inputReader.close();
         lineCounter.close();
         outputWriter.close();
     }
+
 }
