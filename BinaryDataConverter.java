@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -115,17 +116,40 @@ public class BinaryDataConverter {
         return Long.toString(currrentInt);
     }
     
+    public static String addOneToFraction(String s) {
+    	int carry = 1;
+    	char[] addedOne = new char[s.length()];
+    	for (int i = s.length() - 1; i >= 0; i--) {
+    		int bit = Character.getNumericValue(s.charAt(i));
+    		if (bit + carry == 2) {
+    			addedOne[i] = '0';
+    			carry = 1;
+    		}
+    		else if (bit + carry == 1) {
+    			addedOne[i] = '1';
+    			carry = 0;
+    		}
+    		else
+    			addedOne[i] = '0';
+    	}
+    	if (carry == 1) {
+    		addedOne[0] = '1';
+    	}
+    	String added = "";
+    	for (int i = 0; i < addedOne.length; i++)
+    		added += addedOne[i];
+    	return added;
+    }
+    
     public static String binToFloat(String s, int byteDataSize) {
     	int bitDataSize = 8 * byteDataSize;
     	int expBits = byteDataSize * 2 + 2;
     	int signBit = 0, expValue = 0, E = 0, bias = 0;
     	double mantissa = 0;
+    	
 
     	bias = (int) (Math.pow(2, expBits - 1) - 1);
-    	signBit = s.charAt(0) == 1 ? 1 : 0;
-    	
-    	String sign;
-    	sign = signBit == 0 ? "" : "-";
+    	signBit = s.charAt(0) == '1' ? 1 : 0;
     	
     	// calculating exponent value
     	for (int i = 1; i <= expBits; i++) {
@@ -139,14 +163,32 @@ public class BinaryDataConverter {
     		largestExp += 1 * Math.pow(2, expBits - i);
     	}
     	
-    	// splitting the string to make calculating fraction part  easier
+    	// splitting the string to make calculating fraction part easier
     	String fraction = s.substring(expBits + 1, bitDataSize);
     	if (fraction.length() > 13) {
-    		/*
-        	 *  ??? round to even ???
-        	 */
+    		// round to even
+    		 boolean halfWay = false;
+    		 boolean greaterThanHalfWay = false;
     		 String roundFrac = fraction.substring(0, 13);
     	     String checkHalfWay = fraction.substring(13);
+    	     
+    	     if (checkHalfWay.charAt(0) == '1') {
+    	    	 halfWay = true;
+    	    	 for (int i = 1; i < checkHalfWay.length(); i++) {
+    	    		 // greater than half way?
+    	    		 if (checkHalfWay.charAt(i) == '1') {
+    	    			 greaterThanHalfWay = true;
+    	    			 halfWay = false;
+    	    		 }
+    	    	 }
+    	    	 
+    	    	 if (greaterThanHalfWay) 
+    	    		 roundFrac = addOneToFraction(roundFrac);
+    	    	 else if (halfWay && roundFrac.charAt(12) == '1')
+    	    		 roundFrac = addOneToFraction(roundFrac);
+    	    	 
+    	    	 fraction = roundFrac;	 
+    	     }
     	}
     	
     	// calculate mantissa
@@ -164,17 +206,22 @@ public class BinaryDataConverter {
     	// calculate decimal value for both normalized and denormalized values
     	for (int i = 0; i < fraction.length(); i++) {
     		int bit = Character.getNumericValue(fraction.charAt(i));
-    		mantissa += bit * Math.pow(2, (fraction.length() - i - 1));
+    		mantissa += bit * Math.pow(2, -(i + 1));
     	}
     	// return Normalized and Denormalized values
     	if (expValue != largestExp) {
     		double decimalValue = Math.pow(-1, signBit) * mantissa * Math.pow(2, E);
+    		if (decimalValue == 0) 
+    			return signBit == 0 ? "0" : "-0";
+    		if (E == 1) {
+    			return String.format("%.5f", decimalValue);
+    		}
     		return String.format("%.5e", decimalValue);
     	}
     	// return special cases (i.e. inf, NaN)
     	else if (expValue == largestExp) {
     		if (mantissa == 0)
-    			return sign + "inf";
+    			return signBit == 0 ? "inf" : "-inf";
     		else
     			return "NaN";
     	}
@@ -261,14 +308,12 @@ public class BinaryDataConverter {
                     for (int j = 1; j <= HEX_NUMBER / dataSize; j++) {
                         String currentHex = inputNumber.get(i + ":" + j);
                         String currentBin = hexToBin(currentHex);
-                        System.out.println(currentBin);
                         // convert bin to float
-                        String currentFloat = binToFloat(currentBin, dataSize);
-
-                        //put the output to the outputNumber hashmap
-
+                        outputNumber.put(i + ":" + j, binToFloat(currentBin, dataSize));
                     }
                 }
+                printHashMap(outputNumber, rowCounter, dataSize, outputWriter);
+                
                 break;
 
             // karagul
