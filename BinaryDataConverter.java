@@ -2,7 +2,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -32,7 +31,7 @@ public class BinaryDataConverter {
             }
         }
     }
-
+    //will be used to convert current hex to binary
     public static String hexNumbers(char hex) {
         String bin = "";
         switch (hex) {
@@ -89,7 +88,7 @@ public class BinaryDataConverter {
         }
         return bin;
     }
-
+    //convert hex to binary
     public static String hexToBin(String hex) {
         String bin = "";
         for (int i = 0; i < hex.length(); i++) {
@@ -97,7 +96,7 @@ public class BinaryDataConverter {
         }
         return bin;
     }
-
+    //reverse the order due to little endian
     public static String littleEndianHex (String hex) {
         String littleEndian = "";
         for (int i = hex.length() - 1; i >= 0; i--) {
@@ -105,7 +104,7 @@ public class BinaryDataConverter {
         }
         return littleEndian;
     }
-    
+    //convert from binary to unsigned integer
     public static String unsigned(String currentBin) {
         long currrentInt = 0;
         for (int i = 0; i < currentBin.length(); i++) {
@@ -140,7 +139,7 @@ public class BinaryDataConverter {
     		added += addedOne[i];
     	return added;
     }
-    
+    //convert from binary to float
     public static String binToFloat(String s, int byteDataSize) {
     	int bitDataSize = 8 * byteDataSize;
     	int expBits = byteDataSize * 2 + 2;
@@ -229,18 +228,21 @@ public class BinaryDataConverter {
     }
     
     public static void main(String[] args) throws FileNotFoundException, IOException {
+        // crate scanners to read input and write output
         Scanner inputReader = new Scanner(System.in);
         Scanner lineCounter = null;
         Scanner splitter = null;
         FileWriter outputWriter = null;
         File input = null;
 
+        // take input from user
         System.out.println("Give your input in order of inputFileName (input.txt), byteOrderig (l or b), dataType (float or int or unsigned), dataSize (1, 2, 3 or 4) with blanks between: ");
-        String inputFileName = inputReader.next();
-        String byteOrdering = inputReader.next();
-        String dataType = inputReader.next();
-        int dataSize = inputReader.nextInt();
+        String inputFileName = inputReader.next(); // input.txt
+        String byteOrdering = inputReader.next(); // l or b
+        String dataType = inputReader.next(); // float, int or unsigned
+        int dataSize = inputReader.nextInt();// 1, 2, 3 or 4
 
+        // check if the input is valid
         try {
             input = new File("./" + inputFileName);
             lineCounter = new Scanner(input);
@@ -249,15 +251,20 @@ public class BinaryDataConverter {
             System.out.println("Input file is not found.");
         }
 
+        // check if the output file is valid
         try {
             outputWriter = new FileWriter("./output.txt");
         } catch (IOException e) {
             System.out.println("Output file is not found.");
         }
 
+        // count the number of lines in the input file
         int rowCounter = 0;
+
+        // create hashmaps to store the input (hex )and output (decimal) numbers
         HashMap<String, String> inputNumber = new HashMap<String, String>();
         HashMap<String, String> outputNumber = new HashMap<String, String>();
+        // create an array to store the hex numbers in the current line
         String[] dataInCurrentLine = new String[HEX_NUMBER];
 
         while (splitter.hasNextLine()) {
@@ -316,9 +323,32 @@ public class BinaryDataConverter {
                     for (int j = 1; j <= HEX_NUMBER / dataSize; j++) {
                         String currentHex = inputNumber.get(i + ":" + j);
                         String currentBin = hexToBin(currentHex);
-                        // convert bin to int
+                        // put the output to the outputNumber hashmap
+                        // Convert binary string to unsigned integer
+                        char signBit = currentBin.charAt(0);
+                        long tMin = 0;
+                        long positivePart = 0;
+                        long twos;
+                        // most significant bit için negatiflik kısmı
+                        if (signBit == '1') {
+                            tMin = -(long) Math.pow(2, currentBin.length() - 1);
+                            // düzgün değer veriyor mu dene bakalım
+                        } else if (signBit == '0') {
+                            tMin = 0;
+                        } 
 
-                        //put the output to the outputNumber hashmap
+                        for (int k = 1; k < currentBin.length(); k++) {
+                            char c = currentBin.charAt(k);
+                            if (c == '1') {
+                                positivePart += Math.pow(2, currentBin.length() - 1 - k);
+
+                            } else if (c == '0') {
+                                positivePart += 0;
+                            } 
+
+                        }
+                        twos = tMin + positivePart;
+                        outputNumber.put(i + ":" + j, Long.toString(twos));
 
                     }
                 }
@@ -336,10 +366,8 @@ public class BinaryDataConverter {
                         // Convert binary string to unsigned integer
                         outputNumber.put(i + ":" + j, unsigned(currentBin));
                         
-
                     }
                 }
-                printHashMap(outputNumber, rowCounter, dataSize, outputWriter);
                 
                 break;
 
