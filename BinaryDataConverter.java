@@ -97,13 +97,14 @@ public class BinaryDataConverter {
         return bin;
     }
 
-    public static String littleEndianHex (String hex) {
+    public static String littleEndianHex(String hex) {
         String littleEndian = "";
         for (int i = hex.length() - 1; i >= 0; i--) {
             littleEndian += hex.charAt(i);
         }
         return littleEndian;
     }
+
     public static String unsigned(String currentBin) {
         long currrentInt = 0;
         for (int i = 0; i < currentBin.length(); i++) {
@@ -113,7 +114,7 @@ public class BinaryDataConverter {
         }
         return Long.toString(currrentInt);
     }
-    
+
     public static void main(String[] args) throws FileNotFoundException, IOException {
         Scanner inputReader = new Scanner(System.in);
         Scanner lineCounter = null;
@@ -158,16 +159,16 @@ public class BinaryDataConverter {
             dataInCurrentLine = currentLine.split(" ");
             // if the byte ordering is little endian, reverse the order of the hex numbers
             if (byteOrdering.equalsIgnoreCase("l")) {
-                    for (int i = 0; i < HEX_NUMBER; i += dataSize) {
-                        int k = dataSize + i;
-                        for (int j = i; j < i + dataSize/2; j++) {
-                            String temp = dataInCurrentLine[j];
-                            dataInCurrentLine[j] = dataInCurrentLine[k - 1];
-                            dataInCurrentLine[k - 1] = temp;
-                            k--;
-                        }
-                    }    
-            }                         
+                for (int i = 0; i < HEX_NUMBER; i += dataSize) {
+                    int k = dataSize + i;
+                    for (int j = i; j < i + dataSize / 2; j++) {
+                        String temp = dataInCurrentLine[j];
+                        dataInCurrentLine[j] = dataInCurrentLine[k - 1];
+                        dataInCurrentLine[k - 1] = temp;
+                        k--;
+                    }
+                }
+            }
 
             String currentString = "";
             rowCounter++;
@@ -196,7 +197,7 @@ public class BinaryDataConverter {
                         String currentBin = hexToBin(currentHex);
                         // convert bin to float
 
-                        //put the output to the outputNumber hashmap
+                        // put the output to the outputNumber hashmap
 
                     }
                 }
@@ -211,8 +212,21 @@ public class BinaryDataConverter {
                         String currentBin = hexToBin(currentHex);
                         // convert bin to int
 
-                        //put the output to the outputNumber hashmap
+                        // put the output to the outputNumber hashmap
+                        // Convert binary string to unsigned integer
+                        int positivePart = 0;
 
+                        int signInt = -(int) Math.pow(2, currentBin.length() - 1);
+                        for (int k = 0; k < currentBin.length() - 1; k++) {
+                            char c = currentBin.charAt(k);
+                            int digit = Character.getNumericValue(c);
+                            positivePart += digit * Math.pow(2, currentBin.length() - 2 - k);
+                        }
+
+                        // Print the unsigned integer value
+                        System.out
+                                .println("verilen binarymiz bu olsun" + currentBin + " cevabımız da bu: "
+                                        + (signInt + positivePart));
                     }
                 }
 
@@ -225,15 +239,14 @@ public class BinaryDataConverter {
                     for (int j = 1; j <= HEX_NUMBER / dataSize; j++) {
                         String currentHex = inputNumber.get(i + ":" + j);
                         String currentBin = hexToBin(currentHex);
-                        
+
                         // Convert binary string to unsigned integer
                         outputNumber.put(i + ":" + j, unsigned(currentBin));
-                        
 
                     }
                 }
                 printHashMap(outputNumber, rowCounter, dataSize, outputWriter);
-                
+
                 break;
 
             default:
