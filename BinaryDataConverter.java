@@ -217,7 +217,7 @@ public class BinaryDataConverter {
                         long tMin = 0;
                         long positivePart = 0;
                         long twos;
-                        boolean nan = false;
+                        // boolean nan = false;
                         // most significant bit için negatiflik kısmı
 
                         if (signBit == '1') {
@@ -225,13 +225,7 @@ public class BinaryDataConverter {
                             // düzgün değer veriyor mu dene bakalım
                         } else if (signBit == '0') {
                             tMin = 0;
-                        } else {
-                            nan=true;
-                            outputNumber.put(i + ":" + j, "NaN");
-                            System.out.println(
-                                    "NAN 1" + currentBin + " cevabımız NaN: " + positivePart);
-                            break;
-                        }
+                        } 
 
                         for (int k = 1; k < currentBin.length(); k++) {
                             char c = currentBin.charAt(k);
@@ -240,38 +234,34 @@ public class BinaryDataConverter {
 
                             } else if (c == '0') {
                                 positivePart += 0;
-                            } else {
-                                nan=true;
-
-                                outputNumber.put(i + ":" + j, "NaN");
-                                System.out.println(
-                                        "NAN 2" + currentBin + " cevabımız NaN: " + positivePart);
-                                break;
-                            }
+                            } 
 
                         }
                         twos = tMin + positivePart;
-                        if (nan) {
-                            break;
-                        }
-                        // - sonsuz kısımlarına filan fıstık bakacağız
-                        if (twos < -2147483647) {
-                            outputNumber.put(i + ":" + j, "-∞");
-                            System.out.println(
-                                    "NEGATİF " + currentBin + " cevabımız NEGATİF sonsuz:  -∞" + twos);
-                            break;
-                        } else if (twos > 2147483647) {
-                            outputNumber.put(i + ":" + j, "∞");
-                            System.out.println(
-                                    "POSİTİF " + currentBin + " cevabımız POSİTİF sonsuz: ∞" + twos);
-                            break;
-                        }
+                        outputNumber.put(i + ":" + j, Long.toString(twos));
+                        // if (nan) {
+                        //     break;
+                        // }
+                        // // - sonsuz kısımlarına filan fıstık bakacağız
+                        // if (twos < -2147483647) {
+                        //     outputNumber.put(i + ":" + j, "-∞");
+                        //     System.out.println(
+                        //             "NEGATİF " + currentBin + " cevabımız NEGATİF sonsuz:  -∞" + twos);
+                        //     break;
+                        // } else if (twos > 2147483647) {
+                        //     outputNumber.put(i + ":" + j, "∞");
+                        //     System.out.println(
+                        //             "POSİTİF " + currentBin + " cevabımız POSİTİF sonsuz: ∞" + twos);
+                        //     break;
+                        // }
 
-                        else {
-                            outputNumber.put(i + ":" + j, Long.toString(twos));
-                            System.out.println(
-                                    "SIKINTISIZ" + currentBin + " cevabımız SIKINTISIZ : " + twos);
-                        }
+                        // else {
+                        //     outputNumber.put(i + ":" + j, Long.toString(twos));
+                        //     System.out.println(
+                        //             "SIKINTISIZ" + currentBin + " cevabımız SIKINTISIZ : " + twos);
+                        // }
+                        
+
 
                         // Print the unsigned integer value
                         // System.out
