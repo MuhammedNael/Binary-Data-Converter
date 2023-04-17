@@ -301,8 +301,7 @@ public class BinaryDataConverter {
 
         // convert from hexadecimal to decimal
         switch (dataType) {
-
-            // nael ve said
+            // convert float
             case "float":
                 // convert hex to bin
                 for (int i = 1; i <= rowCounter; i++) {
@@ -315,28 +314,27 @@ public class BinaryDataConverter {
                 }
                 
                 break;
-
-            // karagul
+            // convert int
             case "int":
                 // convert hex to bin
                 for (int i = 1; i <= rowCounter; i++) {
                     for (int j = 1; j <= HEX_NUMBER / dataSize; j++) {
                         String currentHex = inputNumber.get(i + ":" + j);
                         String currentBin = hexToBin(currentHex);
-                        // put the output to the outputNumber hashmap
+
                         // Convert binary string to unsigned integer
                         char signBit = currentBin.charAt(0);
                         long tMin = 0;
                         long positivePart = 0;
                         long twos;
-                        // most significant bit için negatiflik kısmı
+                        // decide whether the number is positive or negative
                         if (signBit == '1') {
                             tMin = -(long) Math.pow(2, currentBin.length() - 1);
-                            // düzgün değer veriyor mu dene bakalım
+                            
                         } else if (signBit == '0') {
                             tMin = 0;
                         } 
-
+                        // convert the rest of the bits to decimal
                         for (int k = 1; k < currentBin.length(); k++) {
                             char c = currentBin.charAt(k);
                             if (c == '1') {
@@ -348,14 +346,14 @@ public class BinaryDataConverter {
 
                         }
                         twos = tMin + positivePart;
+                        // put the decimal number to the hashmap
                         outputNumber.put(i + ":" + j, Long.toString(twos));
-
                     }
                 }
 
                 break;
 
-            // kadir
+            // convert unsigned
             case "unsigned":
                 // convert hex to bin
                 for (int i = 1; i <= rowCounter; i++) {
@@ -363,7 +361,7 @@ public class BinaryDataConverter {
                         String currentHex = inputNumber.get(i + ":" + j);
                         String currentBin = hexToBin(currentHex);
                         
-                        // Convert binary string to unsigned integer
+                        // Convert binary string to unsigned integer and put it to the hashmap
                         outputNumber.put(i + ":" + j, unsigned(currentBin));
                         
                     }
