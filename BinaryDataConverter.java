@@ -235,11 +235,14 @@ public class BinaryDataConverter {
         FileWriter outputWriter = null;
         File input = null;
 
-        System.out.println("Enter your input file name (input): ");
-        String inputFileName = inputReader.nextLine();
+        System.out.println("Give your input in order of inputFileName (input.txt), byteOrderig (l or b), dataType (float or int or unsigned), dataSize (1, 2, 3 or 4) with blanks between: ");
+        String inputFileName = inputReader.next();
+        String byteOrdering = inputReader.next();
+        String dataType = inputReader.next();
+        int dataSize = inputReader.nextInt();
 
         try {
-            input = new File("./" + inputFileName + ".txt");
+            input = new File("./" + inputFileName);
             lineCounter = new Scanner(input);
             splitter = new Scanner(input);
         } catch (FileNotFoundException e) {
@@ -251,15 +254,6 @@ public class BinaryDataConverter {
         } catch (IOException e) {
             System.out.println("Output file is not found.");
         }
-
-        System.out.println("Enter your byte ordering type (l or b): ");
-        String byteOrdering = inputReader.nextLine();
-
-        System.out.println("Enter your data type (float, int or unsigned): ");
-        String dataType = inputReader.nextLine();
-
-        System.out.println("Enter the size of data (1, 2, 3 or 4):");
-        int dataSize = inputReader.nextInt();
 
         int rowCounter = 0;
         HashMap<String, String> inputNumber = new HashMap<String, String>();
@@ -353,7 +347,7 @@ public class BinaryDataConverter {
                 break;
         }
         // print the output
-        // printHashMap(outputNumber, rowCounter, dataSize, outputWriter);
+        printHashMap(outputNumber, rowCounter, dataSize, outputWriter);
 
         // close scanners
         inputReader.close();
