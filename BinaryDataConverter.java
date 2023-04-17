@@ -208,69 +208,75 @@ public class BinaryDataConverter {
                     for (int j = 1; j <= HEX_NUMBER / dataSize; j++) {
                         String currentHex = inputNumber.get(i + ":" + j);
                         String currentBin = hexToBin(currentHex);
-                        String testNaN = "10002000000000000000000000000000";
+                        // String testNaN = "01111111111111111111111111111111";
                         // convert bin to int
 
                         // put the output to the outputNumber hashmap
                         // Convert binary string to unsigned integer
-                        char signBit = testNaN.charAt(0);
+                        char signBit = currentBin.charAt(0);
                         long tMin = 0;
                         long positivePart = 0;
                         long twos;
+                        boolean nan = false;
                         // most significant bit için negatiflik kısmı
 
                         if (signBit == '1') {
-                            tMin = -(long) Math.pow(2, testNaN.length() - 1);
+                            tMin = -(long) Math.pow(2, currentBin.length() - 1);
                             // düzgün değer veriyor mu dene bakalım
                         } else if (signBit == '0') {
                             tMin = 0;
                         } else {
+                            nan=true;
                             outputNumber.put(i + ":" + j, "NaN");
                             System.out.println(
-                                    "NAN " + testNaN + " cevabımız NaN: " + positivePart);
+                                    "NAN 1" + currentBin + " cevabımız NaN: " + positivePart);
                             break;
                         }
 
-                        for (int k = 1; k < testNaN.length(); k++) {
-                            char c = testNaN.charAt(k);
+                        for (int k = 1; k < currentBin.length(); k++) {
+                            char c = currentBin.charAt(k);
                             if (c == '1') {
-                                positivePart += Math.pow(2, testNaN.length() - 1 - k);
+                                positivePart += Math.pow(2, currentBin.length() - 1 - k);
 
                             } else if (c == '0') {
                                 positivePart += 0;
                             } else {
+                                nan=true;
+
                                 outputNumber.put(i + ":" + j, "NaN");
                                 System.out.println(
-                                        "NAN " + testNaN + " cevabımız NaN: " + positivePart);
+                                        "NAN 2" + currentBin + " cevabımız NaN: " + positivePart);
                                 break;
                             }
 
                         }
                         twos = tMin + positivePart;
-
+                        if (nan) {
+                            break;
+                        }
                         // - sonsuz kısımlarına filan fıstık bakacağız
                         if (twos < -2147483647) {
                             outputNumber.put(i + ":" + j, "-∞");
                             System.out.println(
-                                    "NEGATİF " + testNaN + " cevabımız NEGATİF sonsuz: " + twos);
+                                    "NEGATİF " + currentBin + " cevabımız NEGATİF sonsuz:  -∞" + twos);
                             break;
                         } else if (twos > 2147483647) {
                             outputNumber.put(i + ":" + j, "∞");
                             System.out.println(
-                                    "POSİTİF " + testNaN + " cevabımız POSİTİF sonsuz: " + twos);
+                                    "POSİTİF " + currentBin + " cevabımız POSİTİF sonsuz: ∞" + twos);
                             break;
                         }
 
                         else {
                             outputNumber.put(i + ":" + j, Long.toString(twos));
                             System.out.println(
-                                    "SIKINTISIZ" + testNaN + " cevabımız SIKINTISIZ : " + twos);
+                                    "SIKINTISIZ" + currentBin + " cevabımız SIKINTISIZ : " + twos);
                         }
 
                         // Print the unsigned integer value
-                        System.out
-                                .println(" verilen binarymiz bu olsun " + testNaN + " cevabımız da bu: "
-                                        + (twos));
+                        // System.out
+                        //         .println(" verilen binarymiz bu olsun " + currentBin + " cevabımız da bu: "
+                        //                 + (twos));
                     }
                 }
 
